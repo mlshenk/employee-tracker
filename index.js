@@ -20,7 +20,7 @@ function init() {
         {
             type: "list",
             message: "What would you like to do?",
-            choices: ["Add a department", "Add a role", "Add an employee", "Update employee roles", "Exit"],
+            choices: ["Add a department", "Add a role", "Add an employee", "Update employee roles", "View departments", "View roles", "View employees", "Exit"],
             name: "init"
         }
     )
@@ -50,82 +50,135 @@ function init() {
                     })
             }
             else if (response.init === "Add a role") {
-                inquirer.prompt(
-                    [
-                        {
-                            type: "input",
-                            message: "What is the title of the role?",
-                            name: "roleTitle"
-                        },
-                        {
-                            type: "input",
-                            message: "What is the salary of the role?",
-                            name: "roleSalary"
-                        },
-                        {
-                            type: "input",
-                            message: "What is the department ID that the role is being added to?",
-                            name: "roleDepartment"
-                        }
-                    ]
-                )
-                    .then(function (roleAnswer) {
-                        console.log(roleAnswer);
-                        connection.query(
-                            "INSERT INTO role SET ?",
-                            {
-                                title: roleAnswer.roleTitle,
-                                salary: roleAnswer.roleSalary,
-                                department_id: roleAnswer.roleDepartment
-                            },
-                            function (err, res) {
-                                if (err) throw err;
-                                console.log(res.affectedRow + " role added!\n");
-                            }
-                        ); init();
+                connection.query("SELECT * FROM department", function (err, res) {
+                    if (err) throw err
+                    const myDepartments = res.map(function (dep) {
+                        return ({
+                            name: dep.name,
+                            value: dep.id
+                        })
                     })
+                    inquirer.prompt(
+                        [
+                            {
+                                type: "input",
+                                message: "Please enter the title for the role?",
+                                name: "roleTitle"
+                            },
+                            {
+                                type: "input",
+                                message: "Please enter the salary for the role?",
+                                name: "roleSalary"
+                            },
+                            {
+                                type: "list",
+                                message: "Please enter the department ID for the role?",
+                                name: "roleDepartment",
+                                choices: myDepartments
+                            }
+                        ]
+                    )
+                        .then(function (roleAnswer) {
+                            console.log(roleAnswer);
+                            connection.query(
+                                "INSERT INTO role SET ?",
+                                {
+                                    title: roleAnswer.roleTitle,
+                                    salary: roleAnswer.roleSalary,
+                                    department_id: roleAnswer.roleDepartment
+                                },
+                                function (err, res) {
+                                    if (err) throw err;
+                                    console.log(res.affectedRow + " role added!\n");
+                                }
+                            ); init();
+                        })
+                })
+
             }
             else if (response.init === "Add an employee") {
-                inquirer.prompt(
-                    [
-                        {
-                            type: "input",
-                            message: "Please enter the employee's first name?",
-                            name: "empFirstName"
-                        },
-                        {
-                            type: "input",
-                            message: "Please enter the employee's last name?",
-                            name: "empLastName"
-                        },
-                        {
-                            type: "input",
-                            message: "Please enter the role ID of this employee?",
-                            name: "empRole"
-                        },
-                        {
-                            type: "input",
-                            message: "Please enter this employee's manager's ID? If no manager, please type '0'",
-                            name: "empManager"
-                        }
-                    ]
-                )
-                    .then(function (empAnswer) {
-                        console.log(empAnswer);
-                        connection.query(
-                            "INSERT INTO employee SET ?",
-                            {
-                                first_name: empAnswer.empFirstName,
-                                last_name: empAnswer.empLastName,
-                                role_id: empAnswer.empRole,
-                                manager_id: empAnswer.empManager
-                            },
-                            function (err, res) {
-                                if (err) throw err;
-                                console.log(res.affectedRow + " employee added!\n")
-                            }
-                        ); init();
+                connection.query("SELECT * FROM role", function (err, res) {
+                    if (err) throw err;
+                    const myRole = res.map(function (role) {
+                        return ({
+                            name: role.title,
+                            value: role.id
+                        })
                     })
+                    connection.query("SELECT * FROM employee", function (error, result) {
+                        if (error) throw error;
+                        const myManager = result.map(function (employee) {
+                            return ({
+                                name: `${employee.first_name} ${employee.last_name}`,
+                                value: employee.id
+                            })
+                        })
+                        myManager.unshift({
+                            name: "None",
+                            value: 0
+                        })
+
+                        inquirer.prompt(
+                            [
+                                {
+                                    type: "input",
+                                    message: "Please enter the employee's first name?",
+                                    name: "empFirstName"
+                                },
+                                {
+                                    type: "input",
+                                    message: "Please enter the employee's last name?",
+                                    name: "empLastName"
+                                },
+                                {
+                                    type: "list",
+                                    message: "Please enter the role ID of this employee?",
+                                    name: "empRole",
+                                    choices: myRole
+                                },
+                                {
+                                    type: "list",
+                                    message: "Please enter the employee's manager?",
+                                    name: "empManager",
+                                    choices: myManager
+                                }
+                            ]
+                        )
+                            .then(function (empAnswer) {
+                                console.log(empAnswer);
+                                if (empAnswer.empManager === 0) {
+                                    connection.query(
+                                        "INSERT INTO employee SET ?",
+                                        {
+                                            first_name: empAnswer.empFirstName,
+                                            last_name: empAnswer.empLastName,
+                                            role_id: empAnswer.empRole,
+                                        },
+                                        function (err, res) {
+                                            if (err) throw err;
+                                            console.log(res.affectedRow + " employee added!\n")
+                                        }
+                                    ); init();
+                                }
+                                else {
+                                    connection.query(
+                                        "INSERT INTO employee SET ?",
+                                        {
+                                            first_name: empAnswer.empFirstName,
+                                            last_name: empAnswer.empLastName,
+                                            role_id: empAnswer.empRole,
+                                            manager_id: empAnswer.empManager
+                                        },
+                                        function (err, res) {
+                                            if (err) throw err;
+                                            console.log(res.affectedRow + " employee added!\n")
+                                        }
+                                    ); init();
+                                }
+                            })
+                    })
+                })
+
             }
             else if (response.init === "Update employee roles") {
                 inquirer.prompt(
@@ -148,10 +201,10 @@ function init() {
                             "UPDATE role SET ? WHERE ?",
                             [
                                 {
-                                    title: updateRoleAnswer.updateRole
+                                    salary: updateRoleAnswer.updateRoleSalary
                                 },
                                 {
-                                    salary: updateRoleAnswer.updateRoleSalary
+                                    title: updateRoleAnswer.updateRole
                                 }
                             ],
                             function (err, res) {
@@ -162,20 +215,28 @@ function init() {
                         )
                     })
             }
-            else {
-                console.log("Selecting all departments, roles and employees...\n");
+            else if (response.init === "View departments") {
                 connection.query("SELECT * FROM department", function (err, res) {
                     if (err) throw err;
                     console.table(res);
                 });
+                init();
+            }
+            else if (response.init === "View roles") {
                 connection.query("SELECT * FROM role", function (err, res) {
                     if (err) throw err;
                     console.table(res);
                 });
+                init();
+            }
+            else if (response.init === "View employees") {
                 connection.query("SELECT * FROM employee", function (err, res) {
                     if (err) throw err;
                     console.table(res);
-                })
+                });
+                init();
+            }
+            else {
                 connection.end();
             }
         })
