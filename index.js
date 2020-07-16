@@ -3,10 +3,10 @@ var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
     host: "localhost",
-    port: 3500,
+    port: 3306,
     user: "root",
     password: "password",
-    database: "employee_db"
+    database: "employees_db"
 });
 
 connection.connect(function (err) {
@@ -62,17 +62,17 @@ function init() {
                         [
                             {
                                 type: "input",
-                                message: "Please enter the title for the role?",
+                                message: "What is the title of the role?",
                                 name: "roleTitle"
                             },
                             {
                                 type: "input",
-                                message: "Please enter the salary for the role?",
+                                message: "What is the salary of the role?",
                                 name: "roleSalary"
                             },
                             {
                                 type: "list",
-                                message: "Please enter the department ID for the role?",
+                                message: "What is the department ID that the role is being added to?",
                                 name: "roleDepartment",
                                 choices: myDepartments
                             }
@@ -117,28 +117,27 @@ function init() {
                             name: "None",
                             value: 0
                         })
-
                         inquirer.prompt(
                             [
                                 {
                                     type: "input",
-                                    message: "Please enter the employee's first name?",
+                                    message: "What is the employee's first name?",
                                     name: "empFirstName"
                                 },
                                 {
                                     type: "input",
-                                    message: "Please enter the employee's last name?",
+                                    message: "What is the employee's last name?",
                                     name: "empLastName"
                                 },
                                 {
                                     type: "list",
-                                    message: "Please enter the role ID of this employee?",
+                                    message: "What is the role ID of this employee?",
                                     name: "empRole",
                                     choices: myRole
                                 },
                                 {
                                     type: "list",
-                                    message: "Please enter the employee's manager?",
+                                    message: "Who is this employee's manager?",
                                     name: "empManager",
                                     choices: myManager
                                 }
@@ -178,19 +177,18 @@ function init() {
                             })
                     })
                 })
-
             }
             else if (response.init === "Update employee roles") {
                 inquirer.prompt(
                     [
                         {
                             type: "input",
-                            message: "Please enter the title of the role you would like to update?",
+                            message: "What is the title of the role you would like to update?",
                             name: "updateRole"
                         },
                         {
                             type: "input",
-                            message: "Please enter the role's new salary?",
+                            message: "What is the role's new salary?",
                             name: "updateRoleSalary"
                         }
                     ]
@@ -219,22 +217,22 @@ function init() {
                 connection.query("SELECT * FROM department", function (err, res) {
                     if (err) throw err;
                     console.table(res);
+                    init();
                 });
-                init();
             }
             else if (response.init === "View roles") {
                 connection.query("SELECT * FROM role", function (err, res) {
                     if (err) throw err;
                     console.table(res);
+                    init();
                 });
-                init();
             }
             else if (response.init === "View employees") {
                 connection.query("SELECT * FROM employee", function (err, res) {
                     if (err) throw err;
                     console.table(res);
+                    init();
                 });
-                init();
             }
             else {
                 connection.end();
