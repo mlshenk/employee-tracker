@@ -94,7 +94,6 @@ function init() {
                             ); init();
                         })
                 })
-
             }
             else if (response.init === "Add an employee") {
                 connection.query("SELECT * FROM role", function (err, res) {
