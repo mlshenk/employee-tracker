@@ -31,7 +31,7 @@ function init() {
                 inquirer.prompt(
                     {
                         type: "input",
-                        message: "What is the name of the department?",
+                        message: "Please enter the name of the department?",
                         name: "departmentName"
                     }
                 )
@@ -62,17 +62,17 @@ function init() {
                         [
                             {
                                 type: "input",
-                                message: "What is the title of the role?",
+                                message: "Please enter the title of the role?",
                                 name: "roleTitle"
                             },
                             {
                                 type: "input",
-                                message: "What is the salary of the role?",
+                                message: "Please enter the salary of the role?",
                                 name: "roleSalary"
                             },
                             {
                                 type: "list",
-                                message: "What is the department ID that the role is being added to?",
+                                message: "Please enter the department ID that the role is being added to?",
                                 name: "roleDepartment",
                                 choices: myDepartments
                             }
@@ -120,17 +120,17 @@ function init() {
                             [
                                 {
                                     type: "input",
-                                    message: "What is the employee's first name?",
+                                    message: "Please enter the employee's first name?",
                                     name: "empFirstName"
                                 },
                                 {
                                     type: "input",
-                                    message: "What is the employee's last name?",
+                                    message: "Please enter the employee's last name?",
                                     name: "empLastName"
                                 },
                                 {
                                     type: "list",
-                                    message: "What is the role ID of this employee?",
+                                    message: "Please enter the role ID of this employee?",
                                     name: "empRole",
                                     choices: myRole
                                 },
@@ -182,12 +182,12 @@ function init() {
                     [
                         {
                             type: "input",
-                            message: "What is the title of the role you would like to update?",
+                            message: "Please enter the title of the role you would like to update?",
                             name: "updateRole"
                         },
                         {
                             type: "input",
-                            message: "What is the role's new salary?",
+                            message: "Please enter the role's new salary?",
                             name: "updateRoleSalary"
                         }
                     ]
