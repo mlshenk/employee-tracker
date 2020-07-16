@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
+// Login info to create mySQL connection
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -8,13 +8,14 @@ var connection = mysql.createConnection({
     password: "password",
     database: "employees_db"
 });
-
+// Error function, if error occurs
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadID);
     init();
 });
 
+// function to initialize the prompts
 function init() {
     inquirer.prompt(
         {
@@ -26,7 +27,7 @@ function init() {
     )
         .then(function (response) {
             console.log(response);
-
+            // First prompt: add a department
             if (response.init === "Add a department") {
                 inquirer.prompt(
                     {
@@ -49,6 +50,7 @@ function init() {
                         ); init();
                     })
             }
+            // Second prompt: add a role
             else if (response.init === "Add a role") {
                 connection.query("SELECT * FROM department", function (err, res) {
                     if (err) throw err
@@ -78,6 +80,7 @@ function init() {
                             }
                         ]
                     )
+                    // Iserts the user entry into roleAnswer DB set
                         .then(function (roleAnswer) {
                             console.log(roleAnswer);
                             connection.query(
@@ -95,6 +98,7 @@ function init() {
                         })
                 })
             }
+            // Third Prompt: add an employee
             else if (response.init === "Add an employee") {
                 connection.query("SELECT * FROM role", function (err, res) {
                     if (err) throw err;
@@ -116,6 +120,7 @@ function init() {
                             name: "None",
                             value: 0
                         })
+                        // Subsequent questions about employee(s)
                         inquirer.prompt(
                             [
                                 {
@@ -142,6 +147,7 @@ function init() {
                                 }
                             ]
                         )
+                        // Inserts user input into SQL database
                             .then(function (empAnswer) {
                                 console.log(empAnswer);
                                 if (empAnswer.empManager === 0) {
@@ -177,6 +183,7 @@ function init() {
                     })
                 })
             }
+            // Option to update existing employee roles
             else if (response.init === "Update employee roles") {
                 inquirer.prompt(
                     [
@@ -212,6 +219,7 @@ function init() {
                         )
                     })
             }
+            // Prompt option to view departments with existing user input
             else if (response.init === "View departments") {
                 connection.query("SELECT * FROM department", function (err, res) {
                     if (err) throw err;
@@ -219,6 +227,7 @@ function init() {
                     init();
                 });
             }
+            // Prompt option to view employee roles with existing user input
             else if (response.init === "View roles") {
                 connection.query("SELECT * FROM role", function (err, res) {
                     if (err) throw err;
@@ -226,6 +235,7 @@ function init() {
                     init();
                 });
             }
+            // Prompt option to view employees with existing user input
             else if (response.init === "View employees") {
                 connection.query("SELECT * FROM employee", function (err, res) {
                     if (err) throw err;
@@ -238,3 +248,5 @@ function init() {
             }
         })
 }
+
+// FIN!
