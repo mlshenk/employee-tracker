@@ -80,7 +80,7 @@ function init() {
                             }
                         ]
                     )
-                    // Iserts the user entry into roleAnswer DB set
+                        // Iserts the user entry into roleAnswer DB set
                         .then(function (roleAnswer) {
                             console.log(roleAnswer);
                             connection.query(
@@ -147,7 +147,7 @@ function init() {
                                 }
                             ]
                         )
-                        // Inserts user input into SQL database
+                            // Inserts user input into SQL database
                             .then(function (empAnswer) {
                                 console.log(empAnswer);
                                 if (empAnswer.empManager === 0) {
